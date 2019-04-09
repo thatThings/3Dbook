@@ -1,0 +1,107 @@
+<!doctype html>
+<html ondragstart="return false">
+<head>
+    <meta  http-equiv="content-type" content="text/html;charset=utf-8">
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+    <style>
+        *{
+            padding: 0;
+            margin: 0;/*清除默认的类边距*/
+        }
+        body{
+            overflow: hidden;
+            background:black; 
+        }
+        #perspective{
+            perspective:800px;/*景深属性*/
+        }
+        #wrap{
+            position: relative;
+            width: 133px;
+            height: 200px;
+            margin: 280px auto;
+            transform-style: preserve-3d;/*视图风格*/
+            transform: rotateX(-20deg);
+        }
+        #wrap img{
+            position: absolute;
+            /* 反射倒影 距离下面5px  */
+            -webkit-box-reflect:below 5px -webkit-linear-gradient(top,rgba(0,0,0,0) 40%,rgba(0,0,0,0.5));
+        }
+
+    </style>
+    <title>3d旋转相册</title>
+    </head>
+    <body>
+        <div id="perspective">
+        <div id="wrap">
+            <img src="img/1.jpg" alt="" />
+            <img src="img/2.jpg" alt="" />
+            <img src="img/3.jpg" alt="" />
+            <img src="img/4.jpg" alt="" />
+            <img src="img/5.jpg" alt="" />
+            <img src="img/6.jpg" alt="" />
+            <img src="img/7.jpg" alt="" />
+            <img src="img/8.jpg" alt="" />
+            <img src="img/9.jpg" alt="" />
+            <img src="img/10.jpg" alt="" />
+            <img src="img/11.jpg" alt="" />
+            </div>
+        </div>
+        
+        <script type="text/javascript">
+        /*
+        求出每一张图片累加的单位度数
+        360/图片数量
+        */
+            var oImg = document.getElementsByTagName("img");//通过标签名获取元素
+            var deg = 360 / oImg.length;//求出图片旋转的单位度数
+            //window。onload意思是页面加载完成之后执行的脚本，如果放在外部引入，则不需要这样写
+            window.onload = function(){
+                Array.prototype.forEach.call(oImg,function(element,index){
+                element.style.transform = "rotateY(" + index*deg + "deg) translateZ(350px)";
+                element.style.transition = "1s " + (oImg.length - index)*0.1 + "s";
+            });//修改函数内部this指向
+            }
+            /*
+            相册拖拽的原理 用过鼠标移动的距离差 改变相册的旋转度数
+            
+            距离差 = 当前的鼠标位置 - 上一次的鼠标位置
+            */
+            var rotateX = -20,//初始旋转度数
+                rotateY = 0;
+           document.onmousedown = function(e){
+               //鼠标按下事件 意味着拖拽相册正式开始
+               var lastX = e.clientX,//点击的时候所产生的坐标点 第一次旧的值
+                   lastY = e.clientY;
+                   
+               
+               this.onmousemove = function(e){
+                   var e = e || window.event;//Event对象兼容处理
+                   //鼠标移动事件 鼠标移动 相册旋转
+                   var newX = e.clientX,//获取新的x鼠标坐标值
+                       newY = e.clientY;//获取新的y鼠标坐标值
+                   var minusX = newX - lastX,//横坐标差值
+                       minusY = newY - lastY;//纵坐标差值
+                       
+                   rotateX -= minusY * 0.1;//a += b 等价于 a= a + b
+                   rotateY += minusX * 0.2;//*0.5调整拖拽速度
+                   
+                   wrap.style.transform = "rotateX("+rotateX+"deg) rotateY("+rotateY+"deg)";
+                   
+                   //tudo 假设这个值我们求出来了 距离差也给了相册旋转度数
+                   //新的坐标值用完之后就变成旧的值
+                   lastX = newX;
+                   lastY = newY;
+               }
+               
+               this.onmouseup = function(){
+                   //鼠标松开事件 整个拖拽结束
+                   this.onmousemove = null;//清空鼠标移动事件
+               }
+           }
+            
+        </script>
+    </body>
+</html>
